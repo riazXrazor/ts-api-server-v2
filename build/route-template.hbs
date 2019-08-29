@@ -1,0 +1,155 @@
+/* tslint:disable */
+{{#if canImportByAlias}}
+  import { Controller, ValidateParam, FieldErrors, ValidateError, TsoaRoute } from 'tsoa';
+{{else}}
+  import { Controller, ValidateParam, FieldErrors, ValidateError, TsoaRoute } from '../../../src';
+{{/if}}
+{{#if iocModule}}
+import { iocContainer } from '{{iocModule}}';
+{{/if}}
+{{#each controllers}}
+import { {{name}} } from '{{modulePath}}';
+{{/each}}
+{{#if authenticationModule}}
+import { expressAuthentication } from '{{authenticationModule}}';
+{{/if}}
+
+const models: TsoaRoute.Models = {
+    {{#each models}}
+    "{{@key}}": {
+        {{#if enums}}
+        "enums": {{{json enums}}},
+        {{/if}}
+        {{#if properties}}
+        "properties": {
+            {{#each properties}}
+            "{{@key}}": {{{json this}}},
+            {{/each}}
+        },
+        {{/if}}
+        {{#if additionalProperties}}
+        "additionalProperties": {{{json additionalProperties}}},
+        {{/if}}
+    },
+    {{/each}}
+};
+
+
+
+
+export default function (fastify: any, _opts: any, done: any) {
+  fastify.decorateRequest('validatedArgs', [])
+  fastify.decorateRequest('getValidatedArgs', getValidatedArgs)
+    {{#each controllers}}
+    {{#each actions}}
+        fastify.route({
+            method: '{{toUpperCase method}}',
+            url: '{{../../basePath}}{{../path}}{{path}}',
+            preHandler: function(request: any, reply: any, done: any){
+                 const args = {
+                            {{#each parameters}}
+                                {{@key}}: {{{json this}}},
+                            {{/each}}
+                        };
+              
+                try {
+                    request.getValidatedArgs(args, request)
+                } catch (err) {
+                    reply.code(400).send(err)
+                }
+                done();
+            },
+            handler: function (request: any, response: any) {                        
+                        {{#if ../../iocModule}}
+                        const controller = iocContainer.get<{{../name}}>({{../name}});
+                        {{else}}
+                        const controller = new {{../name}}();
+                        {{/if}}
+
+                        const promise = controller.{{name}}.apply(controller, request.validatedArgs as any);
+                        promiseHandler(controller, promise, response);
+            }
+        })
+
+    {{/each}}
+    {{/each}}
+
+    {{#if useSecurity}}
+    function authenticateMiddleware(securities: TsoaRoute.Security[] = []) {
+        return (request: any, _response: any, next: any) => {
+            let responded = 0;
+            let success = false;
+            Object.keys(securities)
+              .forEach(name => {
+                expressAuthentication(request, name, securities[name]).then((user: any) => {
+                  // only need to respond once
+                  if (!success) {
+                    success=true;
+                    responded++;
+                    request['user']=user;
+                    next();
+                  }
+                })
+                  .catch((error: any) => {
+                    responded++;
+                    if (responded==securities.length&&!success) {
+                      _response.code(401);
+                      next(error)
+                    }
+                  })
+              })
+        }
+    }
+    {{/if}}
+
+    function promiseHandler(controllerObj: any, promise: any, response: any) {
+        return Promise.resolve(promise)
+            .then((data: any) => {
+                let statusCode;
+                if (controllerObj instanceof Controller) {
+                    const controller = controllerObj as Controller
+                    const headers = controller.getHeaders();
+                    Object.keys(headers).forEach((name: string) => {
+                        response.header(name, headers[name]);
+                    });
+
+                    statusCode = controller.getStatus();
+                }
+
+                if (data || data === false) {
+                    response.code(statusCode || 200).send(data);
+                } else {
+                    response.code(statusCode || 204).send();
+                }
+            })
+            .catch((error: any) => response.code(500).send(error););
+    }
+
+function getValidatedArgs(args: any, request: any): void {
+    const errorFields: FieldErrors = {};
+    const values = Object.keys(args).map(function(key) {
+      const name = args[key].name;
+      switch (args[key].in) {
+        case 'request':
+          return request;
+        case 'query':
+          return ValidateParam(args[key], request.query[name], models, name, errorFields, undefined, { "controllerPathGlobs": ["./src/controllers/**/*.controller.ts"], "specVersion": 3 });
+        case 'path':
+          return ValidateParam(args[key], request.params[name], models, name, errorFields, undefined, { "controllerPathGlobs": ["./src/controllers/**/*.controller.ts"], "specVersion": 3 });
+        case 'header':
+          return ValidateParam(args[key], request.headers[name], models, name, errorFields, undefined, { "controllerPathGlobs": ["./src/controllers/**/*.controller.ts"], "specVersion": 3 });
+        case 'body':
+          return ValidateParam(args[key], request.body, models, name, errorFields, undefined, { "controllerPathGlobs": ["./src/controllers/**/*.controller.ts"], "specVersion": 3 });
+        case 'body-prop':
+          return ValidateParam(args[key], request.body[name], models, name, errorFields, undefined, { "controllerPathGlobs": ["./src/controllers/**/*.controller.ts"], "specVersion": 3 });
+      }
+    });
+
+    if (Object.keys(errorFields).length > 0) {
+      throw new ValidateError(errorFields, '');
+    }
+    request.validatedArgs = values;
+  }
+
+    done();
+}
