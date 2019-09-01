@@ -9,7 +9,7 @@ export const initializeDbConnection = async () => {
     if (e.name === "AlreadyHasActiveConnectionError") {
        connection = await getConnection();
    }  else {
-      console.log("DB connection error: ", e.getMessage());
+      console.log("DB connection error: ", e);
    }
   }
   return connection;

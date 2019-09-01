@@ -2,10 +2,10 @@
 import fastify from "fastify";
 import { Server, IncomingMessage, ServerResponse } from "http";
 import fastifySwagger from 'fastify-swagger'; 
+import fastifyJwt from 'fastify-jwt'; 
 import RegisterRoutes from "./routes";
-
-// import './controllers/users.controller';
-
+import { config } from "dotenv"
+config();
 const server: fastify.FastifyInstance<
   Server,
   IncomingMessage,
@@ -14,7 +14,9 @@ const server: fastify.FastifyInstance<
   logger: true
 });
 
-
+server.register(fastifyJwt, {
+  secret: process.env["APPKEY"] || "secret"
+})
 server.register(RegisterRoutes);
 server.register(fastifySwagger, {
   mode: 'static',
@@ -40,10 +42,10 @@ const start = async () => {
 };
 
 process.on("uncaughtException", error => {
-  console.error(error);
+  server.log.error(error);
 });
 process.on("unhandledRejection", error => {
-  console.error(error);
+  server.log.error(error || {});
 });
 
 start();

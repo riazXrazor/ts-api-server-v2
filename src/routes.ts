@@ -1,22 +1,40 @@
 /* tslint:disable */
+import { initializeDbConnection } from "#config/database";
 import { Controller, ValidateParam, FieldErrors, ValidateError, TsoaRoute } from 'tsoa';
 import { UsersController } from './controllers/users.controller';
 
 const models: TsoaRoute.Models = {
+  "IMeta": {
+    "properties": {
+      "message": { "dataType": "string", "required": true },
+      "status": { "dataType": "double", "required": true },
+    },
+  },
   "IUser": {
     "properties": {
+      "id": { "dataType": "double", "required": true },
       "first_name": { "dataType": "string", "required": true },
       "last_name": { "dataType": "string", "required": true },
       "email": { "dataType": "string", "required": true },
     },
-    "additionalProperties": true,
+  },
+  "IResponseIUserArray": {
+    "properties": {
+      "meta": { "ref": "IMeta", "required": true },
+      "data": { "dataType": "array", "array": { "ref": "IUser" }, "required": true },
+    },
+  },
+  "IResponseIUser": {
+    "properties": {
+      "meta": { "ref": "IMeta", "required": true },
+      "data": { "ref": "IUser", "required": true },
+    },
   },
   "INewUser": {
     "properties": {
       "name": { "dataType": "string", "required": true },
       "email": { "dataType": "string", "required": true },
     },
-    "additionalProperties": true,
   },
 };
 
@@ -26,20 +44,13 @@ const models: TsoaRoute.Models = {
 export default function(fastify: any, _opts: any, done: any) {
   fastify.decorateRequest('validatedArgs', [])
   fastify.decorateRequest('getValidatedArgs', getValidatedArgs)
+  initializeDbConnection();
   fastify.route({
     method: 'GET',
     url: '/api/users',
-    preHandler: function(request: any, reply: any, done: any) {
-      const args = {
-      };
-
-      try {
-        request.getValidatedArgs(args, request)
-      } catch (err) {
-        reply.code(400).send(err)
-      }
-      done();
-    },
+    preHandler: [
+      validateRequest,
+    ],
     handler: function(request: any, response: any) {
       const controller = new UsersController();
 
@@ -51,17 +62,9 @@ export default function(fastify: any, _opts: any, done: any) {
   fastify.route({
     method: 'GET',
     url: '/api/users/new',
-    preHandler: function(request: any, reply: any, done: any) {
-      const args = {
-      };
-
-      try {
-        request.getValidatedArgs(args, request)
-      } catch (err) {
-        reply.code(400).send(err)
-      }
-      done();
-    },
+    preHandler: [
+      validateRequest,
+    ],
     handler: function(request: any, response: any) {
       const controller = new UsersController();
 
@@ -73,18 +76,10 @@ export default function(fastify: any, _opts: any, done: any) {
   fastify.route({
     method: 'POST',
     url: '/api/users/create',
-    preHandler: function(request: any, reply: any, done: any) {
-      const args = {
-        requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "INewUser" },
-      };
-
-      try {
-        request.getValidatedArgs(args, request)
-      } catch (err) {
-        reply.code(400).send(err)
-      }
-      done();
-    },
+    preHandler: [
+      validateRequest,
+      authenticateMiddleware([{ "api_key": [] }]),
+    ],
     handler: function(request: any, response: any) {
       const controller = new UsersController();
 
@@ -94,6 +89,32 @@ export default function(fastify: any, _opts: any, done: any) {
   })
 
 
+  function authenticateMiddleware(_securities: TsoaRoute.Security[] = []) {
+    return AuthRequest
+  }
+
+
+  function AuthRequest(request: any, _reply: any, done: any) {
+
+    if (request.headers && !request.headers.authorization) {
+      done(new Error("Unauth"));
+    }
+
+    done();
+  }
+
+
+  function validateRequest(request: any, reply: any, done: any) {
+    const args = {
+    };
+
+    try {
+      request.getValidatedArgs(args, request)
+    } catch (err) {
+      reply.code(400).send(err)
+    }
+    done();
+  }
 
   function promiseHandler(controllerObj: any, promise: any, response: any) {
     return Promise.resolve(promise)
@@ -115,7 +136,7 @@ export default function(fastify: any, _opts: any, done: any) {
           response.code(statusCode || 204).send();
         }
       })
-      .catch((error: any) => response.code(500).send(error););
+      .catch((error: any) => response.code(500).send(error));
   }
 
   function getValidatedArgs(args: any, request: any): void {

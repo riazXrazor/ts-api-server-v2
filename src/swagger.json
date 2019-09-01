@@ -6,8 +6,29 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"IMeta": {
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"message",
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"IUser": {
 				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
 					"first_name": {
 						"type": "string"
 					},
@@ -19,12 +40,48 @@
 					}
 				},
 				"required": [
+					"id",
 					"first_name",
 					"last_name",
 					"email"
 				],
 				"type": "object",
-				"additionalProperties": true
+				"additionalProperties": false
+			},
+			"IResponseIUserArray": {
+				"properties": {
+					"meta": {
+						"$ref": "#/components/schemas/IMeta"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/IUser"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"meta",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IResponseIUser": {
+				"properties": {
+					"meta": {
+						"$ref": "#/components/schemas/IMeta"
+					},
+					"data": {
+						"$ref": "#/components/schemas/IUser"
+					}
+				},
+				"required": [
+					"meta",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"INewUser": {
 				"properties": {
@@ -40,10 +97,17 @@
 					"email"
 				],
 				"type": "object",
-				"additionalProperties": true
+				"additionalProperties": false
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"api_key": {
+				"type": "apiKey",
+				"name": "Authorization",
+				"in": "header",
+				"description": "access token from the login"
+			}
+		}
 	},
 	"info": {
 		"title": ""
@@ -58,10 +122,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/IUser"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/IResponseIUserArray"
 								}
 							}
 						},
@@ -83,10 +144,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/INewUser"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/IResponseIUser"
 								}
 							}
 						},
@@ -115,7 +173,11 @@
 						"description": "Created"
 					}
 				},
-				"security": [],
+				"security": [
+					{
+						"api_key": []
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"content": {
