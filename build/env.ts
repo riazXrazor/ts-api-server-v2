@@ -11,3 +11,4 @@ createReadStream(".env.example").pipe(createWriteStream(".env")).on("finish", ()
   const end = process.hrtime(start);
   console.log(chalk.greenBright(`✓ .env file generated (${prettyHrtime(end)})`));
 });
+
