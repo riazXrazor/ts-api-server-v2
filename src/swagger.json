@@ -6,24 +6,7 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"IMeta": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"status": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"message",
-					"status"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"IUser": {
+			"IGetUsers": {
 				"properties": {
 					"id": {
 						"type": "number",
@@ -48,42 +31,32 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IResponseIUserArray": {
+			"IGetNewUsers": {
 				"properties": {
-					"meta": {
-						"$ref": "#/components/schemas/IMeta"
+					"id": {
+						"type": "number",
+						"format": "double"
 					},
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/IUser"
-						},
-						"type": "array"
+					"first_name": {
+						"type": "string"
+					},
+					"last_name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
 					}
 				},
 				"required": [
-					"meta",
-					"data"
+					"id",
+					"first_name",
+					"last_name",
+					"email"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IResponseIUser": {
-				"properties": {
-					"meta": {
-						"$ref": "#/components/schemas/IMeta"
-					},
-					"data": {
-						"$ref": "#/components/schemas/IUser"
-					}
-				},
-				"required": [
-					"meta",
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"INewUser": {
+			"ICreateUser": {
 				"properties": {
 					"name": {
 						"type": "string"
@@ -122,7 +95,10 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/IResponseIUserArray"
+									"items": {
+										"$ref": "#/components/schemas/IGetUsers"
+									},
+									"type": "array"
 								}
 							}
 						},
@@ -144,7 +120,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/IResponseIUser"
+									"$ref": "#/components/schemas/IGetNewUsers"
 								}
 							}
 						},
@@ -155,7 +131,17 @@
 					"Users"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/users/create": {
@@ -166,7 +152,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/INewUser"
+									"$ref": "#/components/schemas/ICreateUser"
 								}
 							}
 						},
@@ -183,7 +169,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/INewUser"
+								"$ref": "#/components/schemas/ICreateUser"
 							}
 						}
 					}

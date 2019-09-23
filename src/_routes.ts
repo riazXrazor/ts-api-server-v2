@@ -4,44 +4,9 @@ import { Controller, TsoaRoute } from 'tsoa';
 import { Controller as BaseController } from './controllers/controller.controller';
 import { UsersController } from './controllers/users.controller';
 
-/*const models: TsoaRoute.Models = {
-    "IGetUsers": {
-        "properties": {
-            "id": {"dataType":"double","required":true},
-            "first_name": {"dataType":"string","required":true},
-            "last_name": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-        },
-    },
-    "IGetNewUsers": {
-        "properties": {
-            "id": {"dataType":"double","required":true},
-            "first_name": {"dataType":"string","required":true},
-            "last_name": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-        },
-    },
-    "ICreateUser": {
-        "properties": {
-            "name": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-        },
-    },
-};*/
-
-
-
-
 export default function(fastify: any, _opts: any, done: any) {
   fastify.addSchema({
-    $id: 'IData',
-    type: ['array', 'object'],
-    items: {},
-    properties: {}
-  })
-
-  fastify.addSchema({
-    $id: 'IError',
+    $id: 'errors',
     type: 'array',
     items: {
       type: 'object',
@@ -51,9 +16,24 @@ export default function(fastify: any, _opts: any, done: any) {
       }
     }
   })
-
   fastify.addSchema({
-    $id: 'IMeta',
+    $id: 'data',
+    type: ['array','object'],
+    items: {},
+    properties: {}
+  })
+  fastify.addSchema({
+    $id: 'INewUser',
+    type: ['array','object'],
+    items: {},
+    properties: {
+      "name": { "type": "string", },
+      "email": { "type": "string" },
+    }
+  })
+  
+  fastify.addSchema({
+    $id: 'meta',
     type: 'object',
     properties: {
       message: { type: 'string' },
@@ -61,37 +41,7 @@ export default function(fastify: any, _opts: any, done: any) {
     }
   })
 
-  fastify.addSchema({
-    $id: 'IGetUsers',
-    type: ['array', 'object'],
-    "properties": {
-      "id": { "type": "number" },
-      "first_name": { "type": "string" },
-      "last_name": { "type": "string" },
-      "email": { "type": "string" },
-    },
-    "items": {}
-  })
-  fastify.addSchema({
-    $id: 'IGetNewUsers',
-    type: ['array', 'object'],
-    "properties": {
-      "id": { "type": "number" },
-      "first_name": { "type": "string" },
-      "last_name": { "type": "string" },
-      "email": { "type": "string" },
-    },
-    "items": {}
-  })
-  fastify.addSchema({
-    $id: 'ICreateUser',
-    type: ['array', 'object'],
-    "properties": {
-      "name": { "type": "string" },
-      "email": { "type": "string" },
-    },
-    "items": {}
-  })
+  
   initializeDbConnection();
 
   fastify.route({
@@ -102,25 +52,25 @@ export default function(fastify: any, _opts: any, done: any) {
         '2xx': {
           type: 'object',
           properties: {
-            data: 'IGetUsers#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
         '4xx': {
           type: 'object',
           properties: {
-            data: 'IData#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
         '5xx': {
           type: 'object',
           properties: {
-            data: 'IData#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
       }
@@ -150,25 +100,25 @@ export default function(fastify: any, _opts: any, done: any) {
         '2xx': {
           type: 'object',
           properties: {
-            data: 'IGetNewUsers#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
         '4xx': {
           type: 'object',
           properties: {
-            data: 'IData#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
         '5xx': {
           type: 'object',
           properties: {
-            data: 'IData#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
       }
@@ -182,7 +132,7 @@ export default function(fastify: any, _opts: any, done: any) {
         return;
       }
 
-      const args = getArgs({ id: { "in": "query", "name": "id", "required": true, "dataType": "double" }, }, request)
+      const args = getArgs({}, request)
       const controller = new UsersController(fastify);
 
       const promise = controller.GetNewUsers.apply(controller, args as any);
@@ -199,25 +149,25 @@ export default function(fastify: any, _opts: any, done: any) {
         '2xx': {
           type: 'object',
           properties: {
-            data: 'ICreateUser#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'INewUser#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
         '4xx': {
           type: 'object',
           properties: {
-            data: 'IData#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
         '5xx': {
           type: 'object',
           properties: {
-            data: 'IData#',
-            errors: 'IError#',
-            meta: 'IMeta#',
+            data: 'data#',
+            errors: 'errors#',
+            meta: 'meta#',
           }
         },
       }
@@ -232,10 +182,10 @@ export default function(fastify: any, _opts: any, done: any) {
         return;
       }
 
-      const args = getArgs({ requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "ICreateUser" }, }, request)
+      const args = getArgs({ requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "INewUser" }, }, request)
       const controller = new UsersController(fastify);
-
-      const promise = controller.createUser.apply(controller, args as any);
+       
+      const promise = controller.createUser.apply(controller, args);
       promiseHandler(controller, promise, response);
     }
   })
@@ -340,7 +290,7 @@ export default function(fastify: any, _opts: any, done: any) {
           return request.body[name]
       }
     });
-
+    
     return values;
   }
 
