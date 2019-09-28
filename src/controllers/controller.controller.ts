@@ -15,10 +15,14 @@ export interface IResponse<T> {
 
 export class Controller extends BaseController {
   public fastify: any;
+  public log: any;
+  public jwt: any;
   constructor(fastify?: any) {
     super();
     if (fastify) {
       this.fastify = fastify;
+      this.jwt = this.fastify.jwt;
+      this.log = this.fastify.log;
     }
   }
   public response(data: any, message: string | object = "success", status: number = 200, errors: any = []): any {
