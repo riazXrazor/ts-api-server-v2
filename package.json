@@ -62,7 +62,7 @@
     "tslint": "^5.15.0",
     "tslint-loader": "^3.5.4",
     "typescript": "^3.4.2",
-    "uniqid": "^5.0.3",
+    "uniqid": "^5.0.3"
     
   }
 }
