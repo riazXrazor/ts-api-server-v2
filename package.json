@@ -12,7 +12,6 @@
     "db:migrate": "ts-node -P tsconfig-base.json ./build/migration.ts",
     "db:update": "npm run typeorm migration:run",
     "postinstall": "link-module-alias",
-    "preinstall": "command -v link-module-alias && link-module-alias clean || true",
     "gen:env": "ts-node -P tsconfig-base.json ./build/env.ts",
     "gen:key": "node ./build/key-gen.js",
     "tas": "hygen tas"

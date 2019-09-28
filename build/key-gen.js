@@ -5,6 +5,7 @@ const fs = require("fs");
 
 const pair = keypair();
 const start = process.hrtime();
+fs.mkdirSync('src/certs');
 fs.writeFileSync("./../src/certs/private.key",pair.private);
 fs.writeFileSync("./../src/certs/public.key",pair.public);
 
