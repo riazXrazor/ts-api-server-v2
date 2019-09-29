@@ -43,6 +43,7 @@ export class UsersController extends Controller  {
     this.fastify.log.info(id);
     const user = await User.findOne(id);
     if (!user) {
+      this.setStatus(404);
       throw new NotFoundError(`no user found with id ${id}`);
     }
     user.id = this.fastify.jwt.sign({ id: user.id });

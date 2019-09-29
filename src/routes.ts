@@ -245,14 +245,16 @@ export default function(fastify: any, _opts: any, done: any) {
 
 
   fastify.setErrorHandler((error: any, _request: any, reply: any) => {
-    fastify.log.error("Error:", error)
+    fastify.log.error("500Error:", error)
     const controller = new BaseController();
     const arg: any = [[], "Internal Server Error", 500];
     const promise = controller.response.apply(controller, arg);
-    reply.code(500).send(promise);
+    const statusCode = controller.getStatus();
+    reply.code(statusCode || 500).send(promise);
   });
 
   fastify.setNotFoundHandler((_request: any, reply: any) => {
+    fastify.log.error("404Error:")
     const controller = new BaseController();
     const arg: any = [[], "Endpoint not found", 404];
     const promise = controller.response.apply(controller, arg);
@@ -306,7 +308,7 @@ export default function(fastify: any, _opts: any, done: any) {
 
           statusCode = controller.getStatus();
         }
-
+        fastify.log.error("accept:"+statusCode)
         if (data || data === false) {
           response.code(statusCode || 200).send(data);
         } else {
@@ -317,7 +319,8 @@ export default function(fastify: any, _opts: any, done: any) {
         const controller = new BaseController();
         const arg: any = [[], err.message || err.name, err.status];
         const promise = controller.response.apply(controller, arg);
-        response.code(500).send(promise)
+        const statusCode = err.status;
+        response.code(statusCode || 500).send(promise)
       });
   }
 

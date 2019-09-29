@@ -1,5 +1,5 @@
 ---
-to: ./../src/controllers/<%= name %>.controller.ts
+to: src/controllers/<%= name %>.controller.ts
 unless_exists: true
 ---
 import { Controller } from "#controllers/controller.controller";
