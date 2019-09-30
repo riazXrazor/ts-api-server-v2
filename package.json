@@ -42,6 +42,7 @@
   "devDependencies": {
     "@types/clui": "^0.3.0",
     "@types/dotenv": "^6.1.1",
+    "@types/fs-extra": "^8.0.0",
     "@types/node": "^11.13.0",
     "@types/pretty-hrtime": "^1.0.0",
     "@types/readline-sync": "^1.4.3",
@@ -50,6 +51,7 @@
     "clui": "^0.3.6",
     "enquirer": "^2.3.2",
     "execa": "^2.0.4",
+    "fs-extra": "^8.1.0",
     "handlebars": "^4.1.2",
     "hygen": "^4.0.9",
     "keypair": "^1.0.1",

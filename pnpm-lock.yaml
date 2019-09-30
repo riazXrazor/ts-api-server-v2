@@ -13,6 +13,7 @@ dependencies:
 devDependencies:
   '@types/clui': 0.3.0
   '@types/dotenv': 6.1.1
+  '@types/fs-extra': 8.0.0
   '@types/node': 11.13.21
   '@types/pretty-hrtime': 1.0.0
   '@types/readline-sync': 1.4.3
@@ -21,6 +22,7 @@ devDependencies:
   clui: 0.3.6
   enquirer: 2.3.2
   execa: 2.0.4
+  fs-extra: 8.1.0
   handlebars: 4.4.0
   hygen: 4.0.9
   keypair: 1.0.1
@@ -72,6 +74,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-ftQl3DtBvqHl9L16tpqqzA4YzCSXZfi7g8cQceTz5rOlYtk/IZbFjAv3mLOQlNIgOaylCQWQoBdDQHPgEBJPHg==
+  /@types/fs-extra/8.0.0:
+    dependencies:
+      '@types/node': 11.13.21
+    dev: true
+    resolution:
+      integrity: sha512-bCtL5v9zdbQW86yexOlXWTEGvLNqWxMFyi7gQA7Gcthbezr2cPSOb8SkESVKA937QD5cIwOFLDFt0MQoXOEr9Q==
   /@types/json5/0.0.29:
     dev: true
     resolution:
@@ -1179,7 +1187,6 @@ packages:
       graceful-fs: 4.2.2
       jsonfile: 4.0.0
       universalify: 0.1.2
-    dev: false
     engines:
       node: '>=6 <7 || >=8'
     resolution:
@@ -3271,6 +3278,7 @@ packages:
 specifiers:
   '@types/clui': ^0.3.0
   '@types/dotenv': ^6.1.1
+  '@types/fs-extra': ^8.0.0
   '@types/node': ^11.13.0
   '@types/pretty-hrtime': ^1.0.0
   '@types/readline-sync': ^1.4.3
@@ -3287,6 +3295,7 @@ specifiers:
   fastify-plugin: ^1.6.0
   fastify-register-routes: ^1.1.2
   fastify-swagger: ^2.4.0
+  fs-extra: ^8.1.0
   handlebars: ^4.1.2
   hygen: ^4.0.9
   keypair: ^1.0.1
